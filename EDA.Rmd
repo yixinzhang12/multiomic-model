@@ -1,0 +1,161 @@
+---
+title: "EDA"
+author: "Yixin (Izzy) Zhang"
+date: "2024-01-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## read subset of data
+
+```{r}
+count_lines <- function(file_path) {
+    line_count <- 0
+    con <- file(file_path, open = "rt")
+    while (length(readLines(con, n = 1)) > 0) {
+        line_count <- line_count + 1
+    }
+    close(con)
+    return(line_count)
+}
+
+file_path <- "./GSE162170/GSE162170_multiome_spliced_rna_counts.tsv.gz"  # Adjust this to your file path
+total_lines <- count_lines(file_path)
+```
+
+```{r}
+set.seed(123)  # For reproducibility
+sample_size <- total_lines / 10
+selected_lines <- sort(sample(total_lines, sample_size))
+```
+
+```{r}
+read_selected_lines <- function(file_path, selected_lines) {
+    con <- file(file_path, open = "rt")
+    data <- NULL
+    line_index <- 0
+    while (length(line <- readLines(con, n = 1)) > 0) {
+        line_index <- line_index + 1
+        if (line_index %in% selected_lines) {
+            data <- rbind(data, read.csv(text = line, sep = "\t", header = FALSE))
+        }
+    }
+    close(con)
+    return(data)
+}
+
+sampled_data <- read_selected_lines(file_path, selected_lines)
+colnames(sampled_data) <- names(read.csv(file_path, nrows = 1, sep = "\t"))  # Set column names
+```
+```{r}
+# Viewing the structure of the dataset
+str(sampled_data)
+
+# Basic summary statistics
+summary(sampled_data)
+```
+
+
+## BPCells iterate
+```{r}
+library(BPCells)
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(patchwork)
+})
+```
+
+convert RNA matrix to bitpacked compressed format
+```{r}
+setwd("./GSE162170")
+# Check if we already ran import
+if (!file.exists("rna_raw")) {
+  mat_raw <- open_matrix_10x_hdf5("GSE162170_multiome_rna_counts.tsv.gz", feature_type="Gene Expression") %>% 
+    write_matrix_dir("rna_raw")
+} else {
+  mat_raw <- open_matrix_dir("rna_raw")
+}
+mat_raw
+```
+
+## fread to get columns based on col name
+gene of interest: SOX2 (ENSG00000181449)
+area of interest: HES1
+getting the row names (list of gene names)
+```{r}
+library(vroom)
+
+# Specify the path to your .tsv.gz file
+file_path <- "./GSE162170/GSE162170_multiome_rna_counts.tsv.gz"
+
+# Specify the columns you want to read by name or index
+# For example, to read the first five columns, you can specify their indices as 1:5
+# If you know the column names, you can specify them directly
+columns_to_read <- 1
+
+# Read the file with vroom, specifying columns to read
+gene_names <- vroom(file_path, col_select = columns_to_read, col_names = FALSE)
+
+# Check the first few rows of the loaded data subset
+gene_names
+
+```
+
+(getting col names)
+```{r}
+library(vroom)
+
+# Define the path to your .tsv.gz file
+file_path <- "./GSE162170/GSE162170_multiome_rna_counts.tsv.gz"
+
+# Read in only the first few rows to get column names
+data_preview <- vroom(file_path, n_max = 3)
+
+# Display column names
+colnames(data_preview)
+```
+
+fread to extract 1 column (Note: 1 placeholder is automatically placed at [1,1] since no colname for index)
+```{r}
+library(data.table)
+
+
+# Specify the columns you want to extract by name or by index
+# For example, if you know the names of the columns
+columns_of_interest <- c(1, 2)
+
+# Or, if you know the column indices
+# columns_of_interest <- c(1, 2, 3, 4, 5)
+
+# Use fread to read only the specified columns
+data <- fread(file = file_path, select = columns_of_interest)
+
+# Now `data` contains only the columns you're interested in
+
+```
+
+try fetching colnames based on gene names
+```{r}
+# Find the position of the string in the list
+match_position <- match(gene_of_interest, gene_names$X1)
+
+print(match_position) 
+print(gene_names[match_position,])
+```
+
+```{r}
+# Row index you want to fetch (e.g., the 10th row)
+row_index <- 10
+
+# Read the specific row
+# Note: skip = row_index - 1 because skip is 0-based and we're adjusting for R's 1-based indexing
+specific_row <- vroom(file_path, skip = match_position - 1, n_max = 1, col_names = FALSE)
+
+# Display the fetched row
+print(specific_row)
+
+```
+

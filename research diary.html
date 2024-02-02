@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Research Diary</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="research diary_files/libs/clipboard/clipboard.min.js"></script>
+<script src="research diary_files/libs/quarto-html/quarto.js"></script>
+<script src="research diary_files/libs/quarto-html/popper.min.js"></script>
+<script src="research diary_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="research diary_files/libs/quarto-html/anchor.min.js"></script>
+<link href="research diary_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="research diary_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="research diary_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="research diary_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="research diary_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Research Diary</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="week-4-feb-1" class="level2">
+<h2 class="anchored" data-anchor-id="week-4-feb-1">Week 4 (Feb 1):</h2>
+<section id="thurs-feb1" class="level4">
+<h4 class="anchored" data-anchor-id="thurs-feb1">Thurs Feb1</h4>
+<p>deliverables:</p>
+<ul>
+<li><p>plots/summary stats on 1 gene/region (BPCells, choose gene/region from paper)</p></li>
+<li><p>try rstan</p></li>
+<li><p>mixture of models</p></li>
+<li><p>simulation</p></li>
+<li><p>in the mean time, check out other paper on epigenomic &amp; transcriptomic integration and imputation</p></li>
+</ul>
+<p>Papers:</p>
+<ul>
+<li><p>review: A Review of Integrative Imputation for Multi-Omics Datasets <strong>(</strong><a href="https://www.frontiersin.org/articles/10.3389/fgene.2020.570255/full" class="uri">https://www.frontiersin.org/articles/10.3389/fgene.2020.570255/full</a>): for epigenomic &amp; transcriptomic integration:</p>
+<ul>
+<li><p>ML based regression models:</p>
+<ul>
+<li><p>ensemble learning method (<a href="https://www.frontiersin.org/articles/10.3389/fgene.2020.570255/full#B55">Lin et al., 2016</a>): uses correlations between various types of multi-omics datasets; least square regression model to integrate the multiple results from both self- and cross-imputation strategies into a single prediction model</p></li>
+<li><p>EpiXcan (<a href="https://www.frontiersin.org/articles/10.3389/fgene.2020.570255/full#B94">Zhang et al., 2019</a>): transcriptomic imputation; (1) calculate SNP priors by using a hierarchical Bayesian model (qtlBHM) (<a href="https://www.frontiersin.org/articles/10.3389/fgene.2020.570255/full#B54">Li et al., 2016</a>); (2) transform SNP priors to penalty factors with a mapping function; and (3) predict gene expression by using penalty factors and genotype data in the following weighted elastic net (WENet) equation (<a href="https://www.frontiersin.org/articles/10.3389/fgene.2020.570255/full#B94">Zhang et al., 2019</a>)</p></li>
+<li><p>TOBMI (Trans-Omics Block Missing data Imputation) (<a href="https://www.frontiersin.org/articles/10.3389/fgene.2020.570255/full#B25">Dong et al., 2019</a>): KNN-weighted approach; imputes RNA-seq from DNA methylation probe datasets</p></li>
+</ul></li>
+<li><p>DNN-based transfer learning:</p>
+<ul>
+<li>TDimpute (<a href="https://www.frontiersin.org/articles/10.3389/fgene.2020.570255/full#B96">Zhou X. et al., 2019</a>): is a deep neural network (DNN)-based transfer learning approach; imputes gene expression data using DNA methylation; can be improved by integrating prior biological knowledge regarding the gene-gene interaction factors to reduce parameters of the DNN model</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>Code</strong>:</p>
+<p>fread to get columns based on col name</p>
+<ul>
+<li><p>gene of interest: SOX2 (ENSG00000181449)</p></li>
+<li><p>area of interest: HES1</p></li>
+</ul>
+<p>getting the row names (list of gene names)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vroom)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the path to your .tsv.gz file</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>file_path <span class="ot">&lt;-</span> <span class="st">"./GSE162170/GSE162170_multiome_rna_counts.tsv.gz"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the columns you want to read by name or index</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># For example, to read the first five columns, you can specify their indices as 1:5</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># If you know the column names, you can specify them directly</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>columns_to_read <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the file with vroom, specifying columns to read</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>gene_names <span class="ot">&lt;-</span> <span class="fu">vroom</span>(file_path, <span class="at">col_select =</span> columns_to_read, <span class="at">col_names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using an external vector in selections was deprecated in tidyselect 1.1.0.
+ℹ Please use `all_of()` or `any_of()` instead.
+  # Was:
+  data %&gt;% select(columns_to_read)
+
+  # Now:
+  data %&gt;% select(all_of(columns_to_read))
+
+See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 34105 Columns: 1
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr (1): X1
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the first few rows of the loaded data subset</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(gene_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat &lt;- vroom(...)
+  problems(dat)</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 34,105 × 1
+   X1                                   
+   &lt;chr&gt;                                
+ 1 hft_ctx_w21_dc1r3_r1_AAACAGCCAGCAATAA
+ 2 ENSG00000243485                      
+ 3 ENSG00000237613                      
+ 4 ENSG00000186092                      
+ 5 ENSG00000238009                      
+ 6 ENSG00000239945                      
+ 7 ENSG00000239906                      
+ 8 ENSG00000241860                      
+ 9 ENSG00000241599                      
+10 ENSG00000236601                      
+# ℹ 34,095 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>gene_of_interest <span class="ot">=</span> <span class="st">"ENSG00000181449"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># try fetching colnames based on gene names</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>match_position <span class="ot">&lt;-</span> <span class="fu">match</span>(gene_of_interest, gene_names<span class="sc">$</span>X1)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(match_position) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7020</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(gene_names[match_position,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+  X1             
+  &lt;chr&gt;          
+1 ENSG00000181449</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the specific row</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: skip = row_index - 1 because skip is 0-based and we're adjusting for R's 1-based indexing</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>specific_row <span class="ot">&lt;-</span> <span class="fu">vroom</span>(file_path, <span class="at">skip =</span> match_position <span class="sc">-</span> <span class="dv">1</span>, <span class="at">n_max =</span> <span class="dv">1</span>, <span class="at">col_names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 1 Columns: 8982
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr    (1): X1
+dbl (8981): X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15, X1...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the fetched row</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(specific_row)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8,982
+  X1        X2    X3    X4    X5    X6    X7    X8    X9   X10   X11   X12   X13
+  &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 ENSG0…     0     1     0     1     0     1     0     0     0     0     0     0
+# ℹ 8,969 more variables: X14 &lt;dbl&gt;, X15 &lt;dbl&gt;, X16 &lt;dbl&gt;, X17 &lt;dbl&gt;,
+#   X18 &lt;dbl&gt;, X19 &lt;dbl&gt;, X20 &lt;dbl&gt;, X21 &lt;dbl&gt;, X22 &lt;dbl&gt;, X23 &lt;dbl&gt;,
+#   X24 &lt;dbl&gt;, X25 &lt;dbl&gt;, X26 &lt;dbl&gt;, X27 &lt;dbl&gt;, X28 &lt;dbl&gt;, X29 &lt;dbl&gt;,
+#   X30 &lt;dbl&gt;, X31 &lt;dbl&gt;, X32 &lt;dbl&gt;, X33 &lt;dbl&gt;, X34 &lt;dbl&gt;, X35 &lt;dbl&gt;,
+#   X36 &lt;dbl&gt;, X37 &lt;dbl&gt;, X38 &lt;dbl&gt;, X39 &lt;dbl&gt;, X40 &lt;dbl&gt;, X41 &lt;dbl&gt;,
+#   X42 &lt;dbl&gt;, X43 &lt;dbl&gt;, X44 &lt;dbl&gt;, X45 &lt;dbl&gt;, X46 &lt;dbl&gt;, X47 &lt;dbl&gt;,
+#   X48 &lt;dbl&gt;, X49 &lt;dbl&gt;, X50 &lt;dbl&gt;, X51 &lt;dbl&gt;, X52 &lt;dbl&gt;, X53 &lt;dbl&gt;, …</code></pre>
+</div>
+</div>
+<p>Week 3:</p>
+<p>try stan (probabilistic programming tool, prototyping)</p>
+<p>libraries,</p>
+<p>work on low dimension</p>
+<p>by gene/extend to multiple genes/extend to multiple regions</p>
+<p>mixture of models</p>
+<p>simulation</p>
+<p>start with one gene (mentioned in paper and nearby region) and see if poisson make sense</p>
+<p>scatterplots to see any correlations</p>
+<p>cross validation (generalize to other unseen data)</p>
+<p>likelihood ratio,</p>
+<p><strong>GLM</strong>:</p>
+<p>Let <span class="math inline">\(Y_{ij}\)</span> represent the count of (spliced or unspliced) RNA for gene <span class="math inline">\(i\)</span> in cell <span class="math inline">\(j\)</span>.</p>
+<p><span class="math inline">\(Y_{ij} \sim \text{Poisson}(\lambda_{ij})\)</span> with rate <span class="math inline">\(\lambda{ij}\)</span><em>,</em> where<span class="math inline">\(\lambda{ij}\)</span> is the expression level of gene <span class="math inline">\(i\)</span> in cell <span class="math inline">\(j\)</span>. The PMF of the Poisson distribution is <span class="math inline">\(P(Y_{ij} = k) = \frac{\lambda_{ij}^k e^{-\lambda_{ij}}}{k!}\)</span>, for <span class="math inline">\(y = 0, 1, 2, ...\)</span></p>
+<p>Let <span class="math inline">\(X_{kj}\)</span> denote the accessibility (0 for closed, 1 for open) of region <span class="math inline">\(k\)</span> in cell <span class="math inline">\(j\)</span>. <span class="math inline">\(X_{kj} \sim \text{Bernoulli}(p_{kj})\)</span> with probability <span class="math inline">\(p_{kj}\)</span>, where <span class="math inline">\(p_{kj}\)</span> is the probability of region <span class="math inline">\(k\)</span> being accessible in cell <span class="math inline">\(j\)</span>. The PMF of the Bernoulli distribution is: <span class="math inline">\(P(X_{kj} = x) = p_{kj}^x (1 - p_{kj})^{1-x}\)</span> for <span class="math inline">\(x \in {0, 1}\)</span>.</p>
+<p><strong>Linking Function:</strong> log link model: <span class="math inline">\(\log(\lambda_{ij}) = \beta_0 + \sum_{k=1}^n \beta_k X_{kj}\)</span>, where <span class="math inline">\(\beta_0\)</span> is the intercept and <span class="math inline">\(\beta_k\)</span> are coefficients.</p>
+<p><strong>LMM</strong>:</p>
+<p><strong>Bayesian</strong>:</p>
+</section>
+<section id="thur-feb-1" class="level4">
+<h4 class="anchored" data-anchor-id="thur-feb-1">Thur Feb 1</h4>
+<ul>
+<li><p>modeling chromatin accessibility –&gt; gene expression:</p>
+<ul>
+<li>established causal relationship</li>
+</ul></li>
+<li><p>bayesian:</p></li>
+</ul>
+<p>workflow</p>
+</section>
+<section id="tue-jan-30" class="level4">
+<h4 class="anchored" data-anchor-id="tue-jan-30">Tue Jan 30</h4>
+<ul>
+<li><p>variable selection? dimension reduction?</p>
+<ul>
+<li><p>test distribution before dimension reduction</p></li>
+<li><p>filter out low and high expressed genes</p></li>
+</ul></li>
+<li><p>downstream analysis? what is the end goal for this integration?</p>
+<ul>
+<li>clustering</li>
+<li></li>
+</ul></li>
+</ul>
+</section>
+<section id="meeting" class="level4">
+<h4 class="anchored" data-anchor-id="meeting">meeting:</h4>
+<ul>
+<li><p>simple poisson on the data</p></li>
+<li><p>explicit document</p></li>
+<li><p>define model</p></li>
+<li><p>stan, but other models rstan/pystan</p></li>
+<li><p>simulate data and if can recover it</p></li>
+<li><p>look at data, distribution, chop off chunks (take some genes)</p></li>
+<li><p>mixture of generalized linear models</p></li>
+<li><p>is gene affected by epigenetics or is affecting epigenetics (how can we identify)</p></li>
+<li></li>
+</ul>
+</section>
+</section>
+<section id="week-2" class="level2">
+<h2 class="anchored" data-anchor-id="week-2">Week 2:</h2>
+<section id="thur-jan-25" class="level4">
+<h4 class="anchored" data-anchor-id="thur-jan-25">Thur Jan 25</h4>
+<p>sparsity &amp; high dimensionality?</p>
+<ul>
+<li><p>sparse priors</p></li>
+<li><p>zero-inflated models</p></li>
+</ul>
+<p>Reversing the direction of the relationship in a hierarchical Bayesian model to predict ATAC-seq data (chromatin accessibility) from RNA-seq data (gene expression) is an intriguing approach, particularly given the interplay between gene expression and chromatin state. Here’s how you could structure such a model:</p>
+<p>### Conceptual Framework for RNA-seq to ATAC-seq Prediction</p>
+<p>1. **Model Objective**: Predict binary chromatin accessibility states (ATAC-seq data) from gene expression levels (RNA-seq data).</p>
+<p>2. **Latent Variable**: Introduce a latent variable representing an underlying biological process that influences both gene expression and chromatin accessibility.</p>
+<p>3. **Hierarchical Structure**:</p>
+<ul>
+<li><p>**Layer 1 (Data Level)**: RNA-seq data (gene expression counts) and ATAC-seq data (binary chromatin accessibility states).</p></li>
+<li><p>**Layer 2 (Latent Variable)**: The latent variable captures the transcriptional regulatory state, influenced by gene expression and affecting chromatin accessibility.</p></li>
+<li><p>**Layer 3 (Parameters)**: Parameters define the relationship between gene expression and the latent variable, and between the latent variable and chromatin accessibility.</p></li>
+</ul>
+<p>### Formulating the Hierarchical Model</p>
+<p>1. **Defining the Latent Variable (Z)**:</p>
+<ul>
+<li><span class="math inline">\(Z_i\)</span> represents the latent transcriptional regulatory state for gene <span class="math inline">\(i\)</span>.</li>
+</ul>
+<p>2. <strong>Modeling the First Relationship (Gene Expression to Z)</strong>:</p>
+<ul>
+<li>If \( Y_i \) is the count of gene expression for gene <span class="math inline">\(i\)</span>, model the relationship to <span class="math inline">\(Z_i\)</span> (e.g., using a log link function in a Poisson regression):</li>
+</ul>
+<p><span class="math inline">\(Z_i = f(\alpha_0 + \alpha_1 \log(Y_i + 1))\)</span></p>
+<ul>
+<li><span class="math inline">\(f\)</span> might be a function ensuring the latent variable’s appropriate range, with <span class="math inline">\(\alpha_0, \alpha_1\)</span> as parameters.</li>
+</ul>
+<p>3. <strong>Modeling the Second Relationship (Z to Chromatin Accessibility)</strong>:</p>
+<ul>
+<li>Let <span class="math inline">\(X_i\)</span> be the binary chromatin accessibility state for gene <span class="math inline">\(i\)</span>. Model this with a Bernoulli process, where the probability <span class="math inline">\(p_i\)</span> is a function of <span class="math inline">\(Z_i\)</span>:</li>
+</ul>
+<p><span class="math inline">\(X_i \sim \text{Bernoulli}(p_i)\)</span></p>
+<p><span class="math inline">\(p_i = g(\beta_0 + \beta_1 Z_i)\)</span></p>
+<ul>
+<li><span class="math inline">\(g\)</span> could be a logistic function, ensuring <span class="math inline">\(p_i\)</span> lies between 0 and 1.</li>
+</ul>
+<p><strong>Wed Jan 24</strong></p>
+<p>match unmatched scRNA and scATACseq</p>
+<p>Seurat 3.0: CCA + MNN</p>
+<p><strong>Proposed Parametric Model</strong></p>
+<p>1. <strong>Model Objective</strong>: The goal is to develop a model that uses gene expression profiles (RNA-seq) to predict chromatin accessibility states (ATAC-seq) for corresponding genomic regions. This implies a relationship where gene expression influences or is indicative of chromatin accessibility.</p>
+<p>2. <strong>Formulating the Model</strong>:</p>
+<ul>
+<li><p>Let <span class="math inline">\(Y_i\)</span> represent the RNA expression level for gene <span class="math inline">\(i\)</span>, modeled by a Poisson (or negative binomial) distribution.</p></li>
+<li><p>Let <span class="math inline">\(X_i\)</span> represent the chromatin accessibility (binary) at a region associated with gene <span class="math inline">\(i\)</span>, modeled by a Bernoulli distribution.</p></li>
+</ul>
+<p>3. <strong>Linking RNA-seq to ATAC-seq</strong>: a link function that connects the Poisson-distributed RNA-seq data to the Bernoulli-distributed ATAC-seq data. A potential approach could be a logistic regression model where the log-odds of chromatin accessibility are modeled as a function of gene expression levels:</p>
+<p><span class="math inline">\(\log\left(\frac{P(X_i = 1)}{1 - P(X_i = 1)}\right) = \beta_0 + \beta_1 Y_i\)</span></p>
+<p>Here, <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are parameters to be estimated, linking gene expression to chromatin accessibility.</p>
+<p>4. <strong>Parameter Estimation</strong>: The parameters <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> can be estimated using maximum likelihood estimation or Bayesian methods, depending on the approach and the inclusion of prior knowledge.</p>
+</section>
+<section id="tue-jan-23" class="level4">
+<h4 class="anchored" data-anchor-id="tue-jan-23">Tue Jan 23</h4>
+<p>Tomorrow to-dos:</p>
+<ol type="1">
+<li>Finish going over citations page 10-end</li>
+<li>understand data input and output</li>
+<li>check if joint modeling work and has been done by other groups</li>
+<li>research bayesian joint modeling</li>
+</ol>
+</section>
+<section id="mon-jan-22" class="level4">
+<h4 class="anchored" data-anchor-id="mon-jan-22">Mon Jan 22</h4>
+<p>Tomorrow to-dos:</p>
+<ol type="1">
+<li>examine data and methods used (CCA?) by data paper</li>
+<li>check the corresponding section in review papers</li>
+<li>organize in tables</li>
+</ol>
+<p>to address the following next steps:</p>
+<ul>
+<li><p>developing parametric model to integrate multiple data modalities (ATAC, unspliced RNA, spliced RNA)</p>
+<ul>
+<li><p>search for (method) papers</p>
+<ul>
+<li><p>organize based on statistical frameworks</p></li>
+<li><p>also look into the citations of the data paper (to rule out methods used)</p></li>
+</ul></li>
+</ul></li>
+<li><p>formulate latent generative model (latent –&gt; ATAC/unspliced/spliced)</p></li>
+</ul>
+<p><strong>Joint Meeting</strong>:</p>
+<ul>
+<li><p>Haley’s research</p>
+<ul>
+<li><p>cell cycle phase</p>
+<ul>
+<li>quiescence cells</li>
+</ul></li>
+<li><p>print cells on chips</p>
+<ul>
+<li><p>(iso5, iso10, cellenONE) they are different printing methods (iso5: stop after 5 drops of no cell; iso10: stop after 10 drops of no cell; cellenONE: one cell per well, dispose no cell droplets based on prediction)</p></li>
+<li><p>neuronetwork decide whether cell present in well (after examining the picture after printing)</p></li>
+<li><p>compare quality of those three printing methods</p></li>
+</ul></li>
+<li><p>benchmarking cell cycle calling classification algorithms (on Buettner, Hayashi, and VASAseq(next step) datasets)</p>
+<ul>
+<li><p>Seurat/Scanpy (not functioning very well)</p>
+<ul>
+<li><p>assign cell scores</p></li>
+<li><p>using cell scores to predict cell cycle phase</p></li>
+<li><p>tested</p></li>
+</ul></li>
+<li><p>Deepcycle: circular RNA velocity</p>
+<ul>
+<li><p>autoencoder</p></li>
+<li><p>spliced and unspliced</p></li>
+<li><p>cell assignment</p></li>
+<li><p>correct separation, but incorrect labeling</p></li>
+<li><p>non-coding markers, alternative splicing</p></li>
+<li><p>phase misassignment, direction flipping (based on the training gene pattern)</p></li>
+</ul></li>
+<li><p>Revelio</p></li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="meeting-1" class="level3">
+<h3 class="anchored" data-anchor-id="meeting-1">Meeting:</h3>
+<ul>
+<li><p>epigenomic and transcriptomic integration</p></li>
+<li><p>RNAseq: unspliced and spliced (measures velocity)</p></li>
+<li><p>ATACseq: upstream</p></li>
+<li><p>match these 3, downside is multiome is not particularly scalable, some cells are matching and some are not matched, independent experiment with ATAC and RNA</p></li>
+<li><p>parametric model to integrate independent data</p></li>
+<li><p>joint parametric model to match</p></li>
+<li><p>CCA –&gt; weighted nearest neighbour (non essensial)</p></li>
+<li><p>data: only a small chunck has all three, other cells has one modality</p></li>
+<li><p>bayesian: on one side, we can do some inference on the unmeasured part</p></li>
+<li><p>NCVIG, predictive model to predict RNA based on ATAC or vice versa</p></li>
+<li><p>cis (on the same DNA) and trans (upstream, not on same DNA) factorsin genetics</p>
+<ul>
+<li><p>ATAC mostly on cis factors,</p></li>
+<li><p>gene activity matrix, ATAC (limitations)</p></li>
+<li></li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="week-1" class="level2">
+<h2 class="anchored" data-anchor-id="week-1">Week 1:</h2>
+<section id="next-steps" class="level3">
+<h3 class="anchored" data-anchor-id="next-steps">Next Steps:</h3>
+</section>
+<section id="effort" class="level3">
+<h3 class="anchored" data-anchor-id="effort">Effort:</h3>
+<ul>
+<li><p>tony’s benchmarking work?</p></li>
+<li><p>papers</p>
+<ul>
+<li><p>signac: integration of our ATAC/CUT&amp;Tag and scATAC-seq/scCUT&amp;Tag data</p>
+<ul>
+<li><p>sc chromatin data (scATACseq)</p></li>
+<li><p>integrate seamlessly with Seurat</p></li>
+<li><p>integrate scATACseq with scRNAseq</p></li>
+<li><p>anchors</p></li>
+<li></li>
+</ul></li>
+<li><p>seurat: RNA data integration and cell type identification</p>
+<ul>
+<li><p>R package</p></li>
+<li><p>single cell data, can integrate CITEseq, scATACseq, etc.</p></li>
+<li><p>indentify <strong>anchors</strong> (pairs or groups of cells from different datasets that are predicted to be similar) between datasets</p></li>
+<li><p>supports dimensionality reduction like pca, tsne, umap, and clustering</p></li>
+<li><p>accuracy of integration heavily relies on the quality and comparability of the datasets</p></li>
+<li><p>challenging interpretation</p></li>
+</ul></li>
+<li><p>CCA</p>
+<ul>
+<li>Sparse CCA: find linear combinations of variables in two datasets that are maximally correlated, reduce dimension, feature selection (assumes linear relationships between variables, choice of sparsity parameters (needs tuning), hard to interpret)</li>
+</ul></li>
+<li><p>non-negative matrix factorization</p>
+<ul>
+<li><p>multiomics data structure: multiple layers of omic data. Each layer (like transcriptomic, proteomic data) can be represented as a matrix where columns represent samples, and rows represent molecular features.</p></li>
+<li><p>NMF reduces the dimensionality of each omic layer by extracting latent features that capture the most relevant patterns in the data.</p></li>
+<li><p>integration: concatenate then NMF or NMF separately to each dataset then compare results</p></li>
+<li><p>good interpretability: due to non-negativity, leading to additive, parts-based representations</p></li>
+<li><p>handles heterogeneous data</p></li>
+<li><p>assumes linear additive interactions</p></li>
+<li><p>can be sensitive to initialization</p></li>
+</ul></li>
+<li><p>MOFA</p>
+<ul>
+<li><p>unsupervised, uncovers latent factors</p></li>
+<li><p>handle heterogeneity; It can integrate different types of omics data, even if they have different scales, distributions, or levels of noise.</p></li>
+<li><p>allows missing values</p></li>
+<li><p>input: multiple matrices</p></li>
+<li><p>bayesian factor analysis model, It identifies latent factors and learns the weights (loadings) for each feature in each dataset, explaining how much each feature contributes to each factor.</p></li>
+<li><p>output: latent factors, and how each feature contributes to the latent factors.</p></li>
+<li><p>assumes linear relationships</p></li>
+<li><p>challenging to interpret</p></li>
+</ul></li>
+<li><p>Kernel NMF maps the data to a higher-dimensional space where linear combinations can approximate non-linear relationships in the original space.</p></li>
+<li><p>deep learning architectures</p></li>
+<li><p><strong>Bayesian NMF:</strong></p></li>
+<li></li>
+<li><p><strong>Graph Regularized NMF:</strong> This method incorporates graph-based regularization terms into the NMF framework</p></li>
+<li></li>
+</ul></li>
+<li><p>Epigenomic vs transcriptomics data:</p>
+<ul>
+<li>Epigenomic: DNA, histone, etc. ; data structure: genomic coordinates (start and end position) with corresponding modification levels or accessibility scores</li>
+<li>Transcriptome: RNA stuff; data structure: counts or expression levels for each gene or transcript</li>
+</ul></li>
+</ul>
+</section>
+<section id="meeting-2" class="level3">
+<h3 class="anchored" data-anchor-id="meeting-2">Meeting:</h3>
+<p>Goal:</p>
+<p>Create a table containing methods to jointly analyze multi-omics data, focus on input, output, what aspects did they miss in their analysis/models, and what are the statistical assumptions that we may be able to relax. (will become the intro to paper)</p>
+<p>Rough timeline:</p>
+<ul>
+<li><p>Jan 18-25: Finish problem definitions</p>
+<ul>
+<li><p>Single cell multiomics: single cell RNA-seq + single cell ATAC-seq</p></li>
+<li><p>Spatial multiomics: image data + RNA-seq + histone etc.</p></li>
+<li><p>Q. What are existing methods to jointly analyze multiomics data? What aspects did they miss in their analysis/models? What are the statistical assumptions that we may be able to relax?</p></li>
+<li><p>https://www.10xgenomics.com/datasets</p></li>
+<li><p>Ultimate goal: Find a statistics problem that is (a) interesting to you and (b) feasible (data availability and time constraints).</p></li>
+<li><p>Some in-house tool: https://github.com/causalpathlab/asapR</p></li>
+<li><p>Embedding/matrix factorization with variable selection</p></li>
+<li><p>Graph-constrained of network-guided embedding without PyTorch/Tensorflow/etc</p></li>
+</ul></li>
+<li><p>Feb/Mar: Exploratory data analysis</p></li>
+<li><p>Mar/Apr: New methods/algorithms</p></li>
+<li><p>Apr: manuscript</p></li>
+</ul>
+<p>Papers:</p>
+<p><a href="https://www.nature.com/articles/s41576-023-00586-w">Best practices for single-cell analysis across modalities</a></p>
+<p><a href="https://www.nature.com/articles/s41586-023-057951">Spatial epigenome–transcriptome co-profiling of mammalian tissues</a></p>
+<p><a href="https://www.nature.com/articles/s41587-023-02019-9">Inferring super-resolution tissue architecture by integrating spatial transcriptomics with histology</a></p>
+<p><a href="https://www.nature.com/articles/s41587-023-01657-3">TACCO unifies annotation transfer and decomposition of cell identities for single-cell and spatial omics</a></p>
+<ul>
+<li>Almost all the single-cell omics analysis consist of multiple steps. Goal: Pick one of them and improve that specific one.</li>
+</ul>
+<p><a href="https://www.nature.com/articles/s41588-021-00790-6">archR</a></p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
