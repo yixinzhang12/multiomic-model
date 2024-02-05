@@ -6,6 +6,14 @@ editor: visual
 
 ## Week 4 (Feb 1):
 
+#### Sun Feb 4
+
+-   get visualization/summary of SOX2 and HES1
+
+    -   SOX2: Negative binomial fits better than poisson
+
+-   fit model, get parameter from bayesian hierarchical model
+
 #### Thurs Feb1
 
 deliverables:
