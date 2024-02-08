@@ -20,53 +20,19 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="research diary_files/libs/clipboard/clipboard.min.js"></script>
-<script src="research diary_files/libs/quarto-html/quarto.js"></script>
-<script src="research diary_files/libs/quarto-html/popper.min.js"></script>
-<script src="research diary_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="research diary_files/libs/quarto-html/anchor.min.js"></script>
-<link href="research diary_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="research diary_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="research diary_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="research diary_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="research diary_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="research-diary_files/libs/clipboard/clipboard.min.js"></script>
+<script src="research-diary_files/libs/quarto-html/quarto.js"></script>
+<script src="research-diary_files/libs/quarto-html/popper.min.js"></script>
+<script src="research-diary_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="research-diary_files/libs/quarto-html/anchor.min.js"></script>
+<link href="research-diary_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="research-diary_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="research-diary_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="research-diary_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="research-diary_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -98,6 +64,52 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="week-4-feb-1" class="level2">
 <h2 class="anchored" data-anchor-id="week-4-feb-1">Week 4 (Feb 1):</h2>
+<p>Questions:</p>
+<ul>
+<li><p>what are those different ATAC seq data</p>
+<ul>
+<li>ATAC gene activity (zero inflated beta)</li>
+</ul></li>
+<li><p>zero inflated beta</p>
+<ul>
+<li><p>brms + stan</p>
+<ul>
+<li><p><a href="https://www.andrewheiss.com/blog/2021/11/08/beta-regression-guide/#zero-inflated-beta-regression-bayesian-style" class="uri">https://www.andrewheiss.com/blog/2021/11/08/beta-regression-guide/#zero-inflated-beta-regression-bayesian-style</a> (on brms)</p></li>
+<li><p><a href="https://discourse.mc-stan.org/t/zero-one-inflated-beta-regression-in-stan/1519/14" class="uri">https://discourse.mc-stan.org/t/zero-one-inflated-beta-regression-in-stan/1519/14</a></p></li>
+</ul></li>
+</ul></li>
+</ul>
+<section id="mon-feb-5" class="level4">
+<h4 class="anchored" data-anchor-id="mon-feb-5">Mon Feb 5</h4>
+<ul>
+<li><p>formulate new model with negative binomial and zi beta</p>
+<ul>
+<li>normalizing data?</li>
+</ul></li>
+<li><p>zero inflated beta (<a href="https://www.sciencedirect.com/science/article/pii/S0167947311003628?via=ihub#s000010" class="uri">https://www.sciencedirect.com/science/article/pii/S0167947311003628?via=ihub#s000010</a>)</p>
+<ul>
+<li><p><img src="images/clipboard-299110430.png" class="img-fluid"></p></li>
+<li><p><span class="math inline">\(\alpha\)</span> is the probability of observiing zero</p></li>
+</ul></li>
+<li><p>fit using r and rstan</p>
+<ul>
+<li>prior choice: <a href="https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations" class="uri">https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations</a></li>
+</ul></li>
+</ul>
+</section>
+<section id="sun-feb-4" class="level4">
+<h4 class="anchored" data-anchor-id="sun-feb-4">Sun Feb 4</h4>
+<ul>
+<li><p>get visualization/summary of SOX2 and HES1</p>
+<ul>
+<li>SOX2 (count): Negative binomial</li>
+<li><img src="images/clipboard-3516927629.png" class="img-fluid" width="359"></li>
+<li>HES1(probability of gene activity): zero-inflated beta</li>
+<li><img src="images/clipboard-3004503704.png" class="img-fluid" width="372"></li>
+</ul></li>
+<li><p>fit model, get parameter from bayesian hierarchical model</p></li>
+</ul>
+</section>
 <section id="thurs-feb1" class="level4">
 <h4 class="anchored" data-anchor-id="thurs-feb1">Thurs Feb1</h4>
 <p>deliverables:</p>
@@ -124,118 +136,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul></li>
 </ul></li>
 </ul>
-<p><strong>Code</strong>:</p>
 <p>fread to get columns based on col name</p>
 <ul>
 <li><p>gene of interest: SOX2 (ENSG00000181449)</p></li>
 <li><p>area of interest: HES1</p></li>
 </ul>
-<p>getting the row names (list of gene names)</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vroom)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the path to your .tsv.gz file</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>file_path <span class="ot">&lt;-</span> <span class="st">"./GSE162170/GSE162170_multiome_rna_counts.tsv.gz"</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify the columns you want to read by name or index</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># For example, to read the first five columns, you can specify their indices as 1:5</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># If you know the column names, you can specify them directly</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>columns_to_read <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the file with vroom, specifying columns to read</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>gene_names <span class="ot">&lt;-</span> <span class="fu">vroom</span>(file_path, <span class="at">col_select =</span> columns_to_read, <span class="at">col_names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Using an external vector in selections was deprecated in tidyselect 1.1.0.
-ℹ Please use `all_of()` or `any_of()` instead.
-  # Was:
-  data %&gt;% select(columns_to_read)
-
-  # Now:
-  data %&gt;% select(all_of(columns_to_read))
-
-See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Rows: 34105 Columns: 1
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: "\t"
-chr (1): X1
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the first few rows of the loaded data subset</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(gene_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: One or more parsing issues, call `problems()` on your data frame for details,
-e.g.:
-  dat &lt;- vroom(...)
-  problems(dat)</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 34,105 × 1
-   X1                                   
-   &lt;chr&gt;                                
- 1 hft_ctx_w21_dc1r3_r1_AAACAGCCAGCAATAA
- 2 ENSG00000243485                      
- 3 ENSG00000237613                      
- 4 ENSG00000186092                      
- 5 ENSG00000238009                      
- 6 ENSG00000239945                      
- 7 ENSG00000239906                      
- 8 ENSG00000241860                      
- 9 ENSG00000241599                      
-10 ENSG00000236601                      
-# ℹ 34,095 more rows</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>gene_of_interest <span class="ot">=</span> <span class="st">"ENSG00000181449"</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># try fetching colnames based on gene names</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>match_position <span class="ot">&lt;-</span> <span class="fu">match</span>(gene_of_interest, gene_names<span class="sc">$</span>X1)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(match_position) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 7020</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(gene_names[match_position,])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 1
-  X1             
-  &lt;chr&gt;          
-1 ENSG00000181449</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the specific row</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: skip = row_index - 1 because skip is 0-based and we're adjusting for R's 1-based indexing</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>specific_row <span class="ot">&lt;-</span> <span class="fu">vroom</span>(file_path, <span class="at">skip =</span> match_position <span class="sc">-</span> <span class="dv">1</span>, <span class="at">n_max =</span> <span class="dv">1</span>, <span class="at">col_names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Rows: 1 Columns: 8982
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: "\t"
-chr    (1): X1
-dbl (8981): X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15, X1...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the fetched row</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(specific_row)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 8,982
-  X1        X2    X3    X4    X5    X6    X7    X8    X9   X10   X11   X12   X13
-  &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 ENSG0…     0     1     0     1     0     1     0     0     0     0     0     0
-# ℹ 8,969 more variables: X14 &lt;dbl&gt;, X15 &lt;dbl&gt;, X16 &lt;dbl&gt;, X17 &lt;dbl&gt;,
-#   X18 &lt;dbl&gt;, X19 &lt;dbl&gt;, X20 &lt;dbl&gt;, X21 &lt;dbl&gt;, X22 &lt;dbl&gt;, X23 &lt;dbl&gt;,
-#   X24 &lt;dbl&gt;, X25 &lt;dbl&gt;, X26 &lt;dbl&gt;, X27 &lt;dbl&gt;, X28 &lt;dbl&gt;, X29 &lt;dbl&gt;,
-#   X30 &lt;dbl&gt;, X31 &lt;dbl&gt;, X32 &lt;dbl&gt;, X33 &lt;dbl&gt;, X34 &lt;dbl&gt;, X35 &lt;dbl&gt;,
-#   X36 &lt;dbl&gt;, X37 &lt;dbl&gt;, X38 &lt;dbl&gt;, X39 &lt;dbl&gt;, X40 &lt;dbl&gt;, X41 &lt;dbl&gt;,
-#   X42 &lt;dbl&gt;, X43 &lt;dbl&gt;, X44 &lt;dbl&gt;, X45 &lt;dbl&gt;, X46 &lt;dbl&gt;, X47 &lt;dbl&gt;,
-#   X48 &lt;dbl&gt;, X49 &lt;dbl&gt;, X50 &lt;dbl&gt;, X51 &lt;dbl&gt;, X52 &lt;dbl&gt;, X53 &lt;dbl&gt;, …</code></pre>
-</div>
-</div>
-<p>Week 3:</p>
+</section>
+</section>
+<section id="week-3" class="level2">
+<h2 class="anchored" data-anchor-id="week-3">Week 3:</h2>
 <p>try stan (probabilistic programming tool, prototyping)</p>
 <p>libraries,</p>
 <p>work on low dimension</p>
@@ -253,7 +162,6 @@ dbl (8981): X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15, X1...
 <p><strong>Linking Function:</strong> log link model: <span class="math inline">\(\log(\lambda_{ij}) = \beta_0 + \sum_{k=1}^n \beta_k X_{kj}\)</span>, where <span class="math inline">\(\beta_0\)</span> is the intercept and <span class="math inline">\(\beta_k\)</span> are coefficients.</p>
 <p><strong>LMM</strong>:</p>
 <p><strong>Bayesian</strong>:</p>
-</section>
 <section id="thur-feb-1" class="level4">
 <h4 class="anchored" data-anchor-id="thur-feb-1">Thur Feb 1</h4>
 <ul>

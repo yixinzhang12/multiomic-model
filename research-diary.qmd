@@ -6,11 +6,44 @@ editor: visual
 
 ## Week 4 (Feb 1):
 
+Questions:
+
+-   what are those different ATAC seq data
+
+    -   ATAC gene activity (zero inflated beta)
+
+-   zero inflated beta
+
+    -   brms + stan
+
+        -   <https://www.andrewheiss.com/blog/2021/11/08/beta-regression-guide/#zero-inflated-beta-regression-bayesian-style> (on brms)
+
+        -   <https://discourse.mc-stan.org/t/zero-one-inflated-beta-regression-in-stan/1519/14>
+
+#### Mon Feb 5
+
+-   formulate new model with negative binomial and zi beta
+
+    -   normalizing data?
+
+-   zero inflated beta (<https://www.sciencedirect.com/science/article/pii/S0167947311003628?via=ihub#s000010>)
+
+    -   ![](images/clipboard-299110430.png)
+
+    -   $\alpha$ is the probability of observiing zero
+
+-   fit using r and rstan
+
+    -   prior choice: <https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations>
+
 #### Sun Feb 4
 
 -   get visualization/summary of SOX2 and HES1
 
-    -   SOX2: Negative binomial fits better than poisson
+    -   SOX2 (count): Negative binomial
+    -   ![](images/clipboard-3516927629.png){width="359"}
+    -   HES1(probability of gene activity): zero-inflated beta
+    -   ![](images/clipboard-3004503704.png){width="372"}
 
 -   fit model, get parameter from bayesian hierarchical model
 
@@ -44,52 +77,13 @@ Papers:
 
         -   TDimpute ([Zhou X. et al., 2019](https://www.frontiersin.org/articles/10.3389/fgene.2020.570255/full#B96)): is a deep neural network (DNN)-based transfer learning approach; imputes gene expression data using DNA methylation; can be improved by integrating prior biological knowledge regarding the gene-gene interaction factors to reduce parameters of the DNN model
 
-**Code**:
-
 fread to get columns based on col name
 
 -   gene of interest: SOX2 (ENSG00000181449)
 
 -   area of interest: HES1
 
-getting the row names (list of gene names)
-
-```{r}
-library(vroom)
-
-# Specify the path to your .tsv.gz file
-file_path <- "./GSE162170/GSE162170_multiome_rna_counts.tsv.gz"
-
-# Specify the columns you want to read by name or index
-# For example, to read the first five columns, you can specify their indices as 1:5
-# If you know the column names, you can specify them directly
-columns_to_read <- 1
-
-# Read the file with vroom, specifying columns to read
-gene_names <- vroom(file_path, col_select = columns_to_read, col_names = FALSE)
-
-# Check the first few rows of the loaded data subset
-print(gene_names)
-```
-
-```{r}
-gene_of_interest = "ENSG00000181449"
-
-# try fetching colnames based on gene names
-match_position <- match(gene_of_interest, gene_names$X1)
-
-print(match_position) 
-print(gene_names[match_position,])
-
-# Read the specific row
-# Note: skip = row_index - 1 because skip is 0-based and we're adjusting for R's 1-based indexing
-specific_row <- vroom(file_path, skip = match_position - 1, n_max = 1, col_names = FALSE)
-
-# Display the fetched row
-print(specific_row)
-```
-
-Week 3:
+## Week 3:
 
 try stan (probabilistic programming tool, prototyping)
 
