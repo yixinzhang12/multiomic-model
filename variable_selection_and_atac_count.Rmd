@@ -1,0 +1,24 @@
+---
+title: "variable_selection_and_atac_count"
+author: "Yixin (Izzy) Zhang"
+date: "2024-02-14"
+output: html_document
+---
+## try Ming's variable selection package
+
+## try atac counts
+atac_counts has 467315 rows, much larger than atac_activities
+```{r}
+# library(vroom)
+# 
+# file_path <- "./GSE162170/GSE162170_multiome_atac_counts.tsv.gz"
+# 
+# columns_to_read <- 1
+# 
+# # Read the file with vroom, specifying columns to read
+# Sys.setenv("VROOM_CONNECTION_SIZE"=1e10)#avoid error
+# atac_ct_names <- vroom(file_path, col_select = columns_to_read, col_names = FALSE)
+# 
+# head(atac_ct_names)
+```
+

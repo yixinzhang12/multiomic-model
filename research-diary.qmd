@@ -4,6 +4,169 @@ format: html
 editor: visual
 ---
 
+## Week 7 (Feb 22)
+
+### Plan for this week:
+
+-   Remove outliers
+
+-   research missing data treatments for RNAseq/ATACseq (treat as 0/NA/impute)
+
+-   fomulate GLM and GAM (predict RNA only)
+
+-   variable selection
+
+    -   step-wise
+
+    -   knockoff filter
+
+-   compare GLM and GAM (predict RNA only)
+
+    -   use likelihood ratio test
+
+    -   check correlation
+
+-   implement rstan for bayesian
+
+-   simulate data and compare models
+
+### Meeting:
+
+motivation: linking RNAseq and ATACseq
+
+**Questions to address**:
+
+-   simulation
+
+    -   GLM NB simulation
+
+        -   dependency? (try copula for dependency)
+
+-   Modelling
+
+    -   remove outliers
+
+    ```{=html}
+    <!-- -->
+    ```
+    -   GAM:
+
+        -   write out parametric model
+
+        -   fix GAM (it's currently using Gaussian family)
+
+        -   try rstan
+
+    -   model comparison
+
+        -   check which correlation to use (not pearson, some other correlation for non-normal data)
+
+        -   what does it mean by empirical?
+
+        -   use likelihood to compare model
+
+    -   multi-input/multi-output
+
+    -   variable selection
+
+        -   using knock-off filter
+
+        -   selective inference?
+
+            -   why does it not work for non-gaussian data?
+
+    -   should we treat missing values as zero?
+
+## Week 6 (Feb 15)
+
+### Motivation: 
+
+-   why Integrating:
+
+    -   provide one additional source for imputation
+
+        -   impute RNAseq with ATACseq (<https://www.mdpi.com/1422-0067/24/7/6229>)
+
+        -   propose: impute ATACseq with nearby region and corresponding RNAseq (NMF approach with ATACseq: <https://www.nature.com/articles/s41467-021-26530-2>)
+
+            -   or spliced RNAseq with unspliced (vise versa)
+
+    -   model done on high dimensional space, better interpretability
+
+-   how:
+
+    -   train on a different dataset (similar)
+
+### Selective Inference:
+
+keywords:
+
+-   selective inference in high dimensional regression
+
+    -   sample splitting works on any kind of model (we are using 5 fold cv)
+
+    -   conditional selective inference is underdeveloped on anything beyond linear model (e.g., GLM, GAM)
+
+questions:
+
+-   variable choice (based on paper)
+
+-   low accuracy
+
+-   build on top of glm
+
+-   
+
+-   10x genomics and look at pilot data multiome data
+
+-   signal in rna is replicable in atac
+
+    -   select feature using FDR (e.g., 1%)
+
+-   select genes, then select atac region
+
+-   nonlinear
+
+-   simulate 2 layer data (true atac seq and simulate true rna)s
+
+## Week 5
+
+Objectives:
+
+-   Read atac_counts data
+
+-   Add more variables to model
+
+    -   check for colinearity
+
+-   diagnostic plots (log scale?)
+
+-   check out ming's package
+
+-   bayesian on zero inflated beta
+
+-   mixed effects model?
+
+cmd stan
+
+mimic using binomial model
+
+location information, data no more than 100
+
+find a few locations
+
+colinearity (atac)
+
+ming has poisson variable selection model (modify to negative binomial)
+
+model criticism
+
+try a prior and see if it can recover observed data
+
+how do predict and observed line up (diagnostic tools)
+
+log scale
+
 ## Week 4 (Feb 1):
 
 Questions:
