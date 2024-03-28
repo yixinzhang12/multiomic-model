@@ -1,0 +1,92 @@
+---
+title: "test_gsusie_tutorial"
+author: "Yixin (Izzy) Zhang"
+date: "2024-03-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# install.packages("bigsnpr")
+library(bigsnpr)
+
+`%&%` <- function(a,b) paste0(a,b)
+data.dir <- "../data/genotype"
+dir.create(data.dir, recursive=TRUE, showWarnings=FALSE)
+
+.bed.file <- data.dir %&% "1000G_phase3_common_norel.bed"
+if (!file.exists(.bed.file)) {
+  bigsnpr::download_1000G(data.dir)
+}
+
+.bk.file <- data.dir %&% "1000G_phase3_common_norel.rds"
+if (!file.exists(.bk.file)){
+  BED <- snp_readBed(.bed.file)
+}
+dat <- snp_attach(.bk.file)$genotypes
+
+nn <- 500
+pp <- 2000
+
+set.seed(123456789)
+startpoint <- sample(1 : (ncol(dat)-pp), size = 1)
+if (nn < 2490) {ii.idx <- sample(1 : 2490, size = nn)}
+X <- dat[ii.idx, startpoint : (startpoint+pp-1)]
+
+example.data.dir <- "./example-data/"
+saveRDS(X, file = example.data.dir %&% "genotype-subset-2.rds")
+```
+
+```{r}
+`%&%` <- function(a,b) paste0(a,b)
+example.data.dir <- "./example-data/"
+
+X <- readRDS(example.data.dir %&% "genotype-subset-2.rds")
+nn <- nrow(X)  # 500
+pp <- ncol(X)  # 2000
+
+n_effect_vars <- 3
+
+set.seed(12345)
+
+## independent variables with non-zero effects
+effect_idx <- sample(1:pp, size = n_effect_vars)
+print(effect_idx)
+
+## effect size
+effect_size <- rep(1, times = n_effect_vars)
+
+## linear predictor
+eta <- scale(X[,effect_idx, drop=F] %*% as.matrix(effect_size))
+
+## response
+y <- rpois(nn, exp(eta))
+```
+
+```{r}
+hist(y, breaks = 12)
+```
+
+```{r}
+library(gsusie)
+res_gs <- gsusie(cbind(X, 1), y, family = "poisson")
+```
+
+```{r}
+print_gsusie_coefficients(res_gs)
+```
+
+```{r}
+print(res_gs$sets)
+```
+
+```{r}
+gsusie_plot(res_gs, y = "PIP", 
+            include_intercept = FALSE, 
+            intercept_index = (pp+1), 
+            effect_indices = effect_idx)
+```
+

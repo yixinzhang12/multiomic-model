@@ -1,0 +1,191 @@
+---
+title: "test_gsusie"
+author: "Yixin (Izzy) Zhang"
+date: "2024-03-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Read ATAC data
+```{r}
+library(vroom)
+library(dplyr)
+
+Sys.setenv("VROOM_CONNECTION_SIZE"=1000000000)
+
+atac_act_file_path <- "./GSE162170/GSE162170_multiome_atac_gene_activities.tsv.gz"
+
+# Read data with vroom, skipping the first row (since we don't have data at [1,1] it woudl crunch the cols)
+atac_real_data <- vroom(atac_act_file_path, delim = "\t", col_names = FALSE, col_types = cols(), skip = 1)
+```
+transpose data, and set genenames as colnames
+```{r}
+atac_real_data = data.frame(t(atac_real_data))
+# atac_real_data = setNames(data.frame(t(atac_real_data)), atac_real_data[,1])
+```
+
+```{r}
+colnames(atac_real_data) <- unlist(atac_real_data[1, ])
+```
+
+```{r}
+atac_real_data <- atac_real_data[-1, ]
+```
+
+```{r}
+# atac_real_data <- mutate_all(atac_real_data, function(x) as.numeric(as.character(x)))
+atac_real_data[] <- lapply(atac_real_data, function(x) if(is.character(x)) as.numeric(x) else x)
+
+
+```
+
+```{r}
+percentage_zeros <- sapply(atac_real_data, function(column) {
+  mean(column == 0) * 100
+})
+```
+
+```{r}
+hist(percentage_zeros)
+```
+
+34 non-unique col names, make them unique
+```{r}
+library(dplyr)
+
+# Create a function to rename duplicates with a unique suffix
+make_unique <- function(names) {
+  counts <- ave(seq_along(names), names, FUN = seq_along)
+  unique_names <- ifelse(counts == 1, names, paste(names, counts, sep = "_"))
+  return(unique_names)
+}
+
+# Apply the function to your dataframe's column names
+colnames(atac_real_data) <- make_unique(colnames(atac_real_data))
+
+```
+
+Remove cols with missingness over 50% (arbitrary) (80% too much memory during gsusie)
+```{r}
+library(dplyr)
+
+# Calculate the percentage of 0s for each column
+percent_zeros <- atac_real_data %>%
+  summarise(across(everything(), ~mean(.x == 0) * 100))
+
+# Identify columns with 50% or fewer zeros
+vars_to_keep <- names(percent_zeros)[percent_zeros <= 50]
+
+# Filter the original dataframe to keep only the identified columns
+atac_real_data_filtered <- atac_real_data %>%
+  select(all_of(vars_to_keep))
+
+# View the filtered dataframe
+# print(atac_real_data)
+
+```
+
+```{r}
+cols_to_remove <- sapply(atac_real_data, function(column) mean(column == 0) > 0.5)
+atac_real_data_0_filtered <- atac_real_data[, !cols_to_remove]
+```
+
+prepare RNAseq data
+get from ``test_data``
+```{r}
+rna_7_var <- read.csv('./test_data/rna_7_var.csv')
+```
+
+take a look at distribution
+```{r}
+hist(rna_7_var$SOX2, breaks = 12)
+```
+apply log1p
+```{r}
+SOX2RNA <- exp(log1p(rna_7_var$SOX2))
+hist(SOX2RNA)
+```
+```{r}
+# write.csv(atac_real_data, "./test_data/rearranged_atac_activity.csv")
+write.csv(atac_real_data_0_filtered, "./test_data/zero_rm_50_atac_activity.csv")
+```
+
+```{r}
+mean(SOX2RNA)
+var(SOX2RNA)
+```
+overdispersion
+
+# Apply gsusie
+```{r}
+atac_real_data_0_filtered <- read.csv("./test_data/zero_rm_50_atac_activity.csv")
+```
+
+```{r}
+atac_matrix <- as.matrix(atac_real_data_0_filtered)
+colnames(atac_matrix) <- NULL
+rna_matrix <- as.matrix(SOX2RNA)
+```
+
+Took 15 minutes to run on 50% of ATACseq data
+```{r}
+library(gsusie)
+res_gs <- gsusie(cbind(atac_matrix, 1), rna_matrix, family = "poisson")
+```
+
+```{r}
+print_gsusie_coefficients(res_gs)
+```
+
+
+```{r}
+print(res_gs$sets)
+```
+
+```{r}
+gsusie_plot(res_gs, y = "PIP", include_intercept = FALSE, intercept_index = (ncol(atac_matrix)+1))
+```
+
+```{r}
+gsusie_plot(res_gs, y = "PIP", include_intercept = TRUE)
+```
+
+find out the names to those atacseq
+```{r}
+atac_filtered_colnames <- colnames(atac_real_data_0_filtered)
+atac_filtered_colnames[as.integer(res_gs$sets$cs)]
+```
+
+## ATACseq data contains missing (0s) and is lognormal 
+1. gsusie does not work with -Inf values (Too much abnormal subjects detected!)
+2. replace 0 with NA (Too much abnormal subjects detected!)
+```{r}
+atac_matrix_NA <- atac_matrix
+atac_matrix_NA[atac_matrix_NA == 0] <- NA
+atac_log_matrix_NA <- log(atac_matrix_NA)
+```
+standardize
+```{r}
+atac_log_matrix_NA_st <- atac_log_matrix_NA %>% mutate_all(~(scale(.) %>% as.vector))
+```
+
+3. listwise deletion & pairwise deletion (removes all the rows)
+```{r}
+# rows_with_zeros <- apply(atac_matrix, 1, function(x) any(x == 0))
+# atac_matrix_0_rm <- atac_matrix[!rows_with_zeros, ]
+# atac_log_matrix_0_rm <- log(atac_matrix_0_rm)
+```
+4. Imputation
+```{r}
+library(hdImpute)
+## hdImpute: fast random forest
+hdImpute(data.frame(atac_log_matrix_NA_st), batch = 100, seed = 0, save = TRUE)
+```
+
+```{r}
+res_gs <- gsusie(cbind(atac_log_matrix_0_rm, 1), rna_matrix, family = "poisson")
+```
+

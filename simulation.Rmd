@@ -1,0 +1,130 @@
+---
+title: "simulation"
+author: "Yixin (Izzy) Zhang"
+date: "2024-03-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I hope to:
+1. Simulate RNA (NB) and ATAC(sparsity = 0.6, lognormal)
+2. Fit GAM, Random Forest, and SVM
+3. Test accuracy
+
+# Simulation
+```{r}
+set.seed(123) 
+n <- 1000
+
+# RNA
+r_rna <- 0.1602117
+p_rna <- 0.7767963
+
+# ATAC 
+meanlog_atac <- -9.419242
+sdlog_atac <- sqrt(0.7576656)
+missingness_mean <- 0.3821719
+missingness_var <- 0.002693499
+
+# Simulate RNAseq data
+simulate_rnaseq <- function(n, r, p) {
+  data <- rnbinom(n, size = r, prob = p)
+  return(data)
+}
+
+# Simulate ATACseq data
+simulate_atacseq <- function(n, meanlog, sdlog, missingness_mean, missingness_var) {
+  data <- rlnorm(n, meanlog = meanlog, sdlog = sdlog)
+  missing_indices <- sample(1:n, size = floor(n * rnorm(1, missingness_mean, missingness_var)), replace = FALSE)
+  data[missing_indices] <- 0
+  return(data)
+}
+
+# Generate data for 5 RNAseq and 5 ATACseq samples
+rna_data <- replicate(5, simulate_rnaseq(n, r_rna, p_rna))
+atac_data <- replicate(5, simulate_atacseq(n, meanlog_atac, sdlog_atac, missingness_mean, missingness_var))
+
+```
+
+```{r}
+colMeans(rna_data == 0)
+colMeans(atac_data == 0) ## make this a range
+```
+
+```{r}
+colnames(rna_data) <- c('RNA1', 'RNA2', 'RNA3', 'RNA4', 'RNA5')
+colnames(atac_data) <- c('ATAC1', 'ATAC2', 'ATAC3', 'ATAC4', 'ATAC5')
+sim_dta1 <- dplyr::cross_join(data.frame(atac_data), data.frame(rna_data))
+```
+
+```{r}
+plot(sim_dta1$ATAC1, sim_dta1$RNA1)
+
+```
+
+
+```{r}
+library(mgcv)
+library(dplyr)
+sim_dta1_ATAC_zero_removed <- filter(sim_dta1, ATAC1 > 0, ATAC2 > 0, ATAC3 > 0, ATAC4 > 0, ATAC5 > 0)
+nb_glm_gam <- gam(RNA1 ~ log(ATAC1), data = sim_dta1_ATAC_zero_removed, family=nb(link = 'log'))
+summary(nb_glm_gam)
+```
+
+# Simulate using scMultiSim
+```{r}
+library(scMultiSim)
+scMultiSim_results <- sim_true_counts(list(
+    GRN = NA, #no GRN effect
+    tree = Phyla1(), #linear tree
+    num.cells = 100,
+    num.genes = 200
+    #optional
+))
+```
+```{r}
+add_expr_noise(scMultiSim_results)
+```
+
+```{r}
+multisim_atac <- scMultiSim_results$atac_counts
+X <- data.frame(t(multisim_atac))
+```
+
+```{r}
+multisim_rna <- scMultiSim_results$counts
+y <- data.frame(t(multisim_rna))$gene1
+```
+
+```{r}
+cor_matrix <- cor(X, use = "complete.obs") # Handles missing values
+high_cor <- which(abs(cor_matrix) > 0.8, arr.ind = TRUE)
+
+# Exclude self-correlations
+high_cor <- high_cor[high_cor[,1] != high_cor[,2],]
+
+# Get unique pairs since matrix is symmetric
+high_cor <- high_cor[high_cor[,1] < high_cor[,2],]
+
+```
+
+```{r}
+# Using ggplot2 for a subset of highly correlated variables
+library(ggplot2)
+library(reshape2)
+
+# Convert to a data frame for ggplot2
+high_cor_df <- melt(cor_matrix[unique(c(high_cor[,1], high_cor[,2])), unique(c(high_cor[,1], high_cor[,2]))])
+
+ggplot(data = high_cor_df, aes(x=Var1, y=Var2, fill=value)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0, limit = c(-1,1), name="Correlation") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
+  labs(x='', y='', title='High Correlations in High-Dimensional Data')
+
+```
+

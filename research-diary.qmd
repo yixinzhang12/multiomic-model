@@ -6,11 +6,73 @@ editor: visual
 
 ## Week 7 (Feb 22)
 
-### Plan for this week:
+### Plan for this week (map atac to rna):
 
 -   Remove outliers
 
+-   look at distribution
+
+    -   RNA
+
+        -   NB(r = 0.1602117, p = 0.7767963)
+
+        <!-- -->
+
+        -   mean missingness = 0.783718
+
+    -   ATAC
+
+        -   lognormal (meanlog = -9.419242, varlog = 0.7576656)
+
+        <!-- -->
+
+        -   mean missingness = 0.3821719
+
+        -   var missingness = 0.002693499
+
+-   simulate
+
 -   research missing data treatments for RNAseq/ATACseq (treat as 0/NA/impute)
+
+    -   check for sparsity (how much data missing)
+
+        -   data density plot if we have computing power to examine the entire dataset
+
+            e.g.,![](images/clipboard-1811250792.png){width="168"}
+
+        -   based on the density plot, remove the most sparse columns. Thus, before applying imputation or other methods, we would choose a sparsity level at which to limit our dataset.
+
+    -   
+
+    -   imputation
+
+        -   Assume Missing At Random (MAR)
+
+        -   Multiple Imputation using Multiple Imputation by Chained Equations (MICE)
+
+        -   Advantage to imputation: less likely to overfit
+
+        -   RNAseq
+
+            -   plan: work on non-zero part first, check out scRNA imputation work and link scATAC to them
+            -   Imputation works summarized: <https://biocellgen-public.svi.edu.au/mig_2019_scrnaseq-workshop/handling-sparsity.html#>
+            -   leave as 0, fit negative binomial model
+            -   too many missing \>50%
+                -   literature: scRNA missing can be as high as 90% <https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02601-5#:~:text=While%20the%20proportion%20of%20zeros,%2Dseq%20data%20%5B43%5D.>
+
+                    -   against using zero-inflated models or imputation
+
+                    -   treat 0 as useful information
+
+                    -   biological zeros vs non-biological (technical) zeros
+            -   see if from the same genes
+                -   no, the missingness is spread out
+            -   other imputation methods: MAGIC, scImpute, DCA and SAVER
+
+        -   ATACseq
+
+            -   We can assume MAR (loss of DNA material during the sequencing protocol) <https://www.nature.com/articles/s41467-021-26530-2>
+            -   multiple imputation using MICE
 
 -   fomulate GLM and GAM (predict RNA only)
 
@@ -45,41 +107,30 @@ motivation: linking RNAseq and ATACseq
 -   Modelling
 
     -   remove outliers
-
-    ```{=html}
-    <!-- -->
-    ```
     -   GAM:
-
         -   write out parametric model
 
         -   fix GAM (it's currently using Gaussian family)
 
         -   try rstan
-
     -   model comparison
-
         -   check which correlation to use (not pearson, some other correlation for non-normal data)
 
         -   what does it mean by empirical?
 
         -   use likelihood to compare model
-
     -   multi-input/multi-output
-
     -   variable selection
-
         -   using knock-off filter
 
         -   selective inference?
 
             -   why does it not work for non-gaussian data?
-
     -   should we treat missing values as zero?
 
 ## Week 6 (Feb 15)
 
-### Motivation: 
+### Motivation:
 
 -   why Integrating:
 

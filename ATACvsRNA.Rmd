@@ -92,6 +92,45 @@ ggplot(sox2, aes(x = V1)) +
 ```
 
 ```{r}
+temp_dta <- read.csv("test_data/total_7_var.csv")
+```
+
+```{r}
+library(pscl)
+library(ggplot2)
+
+# Step 1: Fit a zero-inflated Poisson model
+zip_model <- zeroinfl(SOX2_RNA ~ 1, data = temp_dta, dist = "poisson")
+
+# Step 2: Extract model parameters
+# Extract Poisson mean
+lambda <- coef(zip_model)["count_(Intercept)"]
+lambda <- exp(lambda) # Convert from log scale
+
+# Extract zero-inflation probability
+prob_zero_inflation <- coef(zip_model)["zero_(Intercept)"]
+prob_zero_inflation <- plogis(prob_zero_inflation) # Convert from logit scale
+
+# Step 3: Simulate data from the ZIP model
+set.seed(123) # For reproducibility
+n <- nrow(temp_dta) # Number of data points to simulate, matching the original dataset
+simulated_zip <- ifelse(runif(n) < prob_zero_inflation, 0, rpois(n, lambda))
+
+# Step 4: Plot the observed data and overlay the simulated ZIP data
+ggplot() +
+  # Histogram of the observed data
+  geom_histogram(data = temp_dta, aes(x = SOX2_RNA, y = ..density..), 
+                 binwidth = 1, fill = "gray", color = "black", alpha = 0.5) +
+  # Density plot of the simulated ZIP data
+  geom_density(data = data.frame(simulated_zip), aes(x = simulated_zip), 
+               color = "blue", size = 1.5) +
+  labs(title = "Histogram of Gene Expression with Simulated ZIP Overlay",
+       x = "Expression Level",
+       y = "Density") +
+  theme_minimal()
+
+```
+```{r}
 # fit NB
 nb_model <- glm.nb(V1 ~ 1, data = sox2)
 
@@ -186,6 +225,37 @@ ggplot(atac, aes(x = V1)) +
        y = "Density") +
   theme_minimal()
 ``` 
+
+```{r}
+library(gamlss)
+library(ggplot2)
+
+# Assuming 'atac$V1' contains your data
+data <- atac$V1
+
+# Fit a Beta distribution to the data
+fit_beta <- gamlss(V1 ~ 1, family = BE, data = atac)
+
+# Summary of the fitted Beta model
+summary(fit_beta)
+
+# Generate a sequence of values for the x-axis, covering the range of your data
+x_values <- seq(from = min(data, na.rm = TRUE), to = max(data, na.rm = TRUE), length.out = 100)
+
+# Calculate predicted densities for these values
+predicted_densities <- dbeta(x_values, shape1 = fit_beta$mu.linkinv(fit_beta$mu.coefficients), shape2 = fit_beta$sigma.linkinv(fit_beta$sigma.coefficients))
+
+# Plotting
+ggplot(atac, aes(x = V1)) +
+  geom_histogram(aes(y = ..density..), fill = "gray", color = "black", alpha = 0.5, binwidth = 0.01) +
+  geom_line(data = data.frame(x_values, predicted_densities), aes(x = x_values, y = predicted_densities), color = "blue", size = 1) +
+  labs(title = "Histogram of Actual Data with Fitted Beta Distribution",
+       x = "Value",
+       y = "Density") +
+  theme_minimal()
+
+```
+
 
 # Fit Simple GLM
 ## prep data

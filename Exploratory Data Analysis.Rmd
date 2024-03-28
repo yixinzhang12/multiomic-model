@@ -1,0 +1,491 @@
+---
+title: "Exploratory Data Analysis"
+author: "Yixin (Izzy) Zhang"
+date: "2024-03-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Read Data
+
+```{r}
+dta <- read.csv('./test_data/total_7_var.csv', header = T)
+```
+
+# Visualize Data
+```{r}
+plot(log(dta$SOX2_ATAC), log(dta$SOX2_RNA))
+```
+
+```{r}
+hist(log(dta$SOX2_RNA + 1))
+```
+
+```{r}
+# Calculate Z-score
+z_scores <- scale(dta)
+
+# IQR method for a specific variable
+Q1 <- quantile(dta$SOX2_RNA, 0.25)
+Q3 <- quantile(dta$SOX2_RNA, 0.75)
+IQR_value <- Q3 - Q1
+outliers <- dta$SOX2_RNA < (Q1 - 1.5 * IQR_value) | dta$SOX2_RNA > (Q3 + 1.5 * IQR_value)
+
+# Visual inspection
+boxplot(dta$SOX2_RNA)
+hist(dta$SOX2_RNA)
+plot(dta$SOX2_RNA, dta$SOX2_ATAC)
+
+```
+
+
+
+# Remove Outliers
+
+# Address Sparsity
+## Visualize how much data are 0
+```{r}
+library(tidyr)
+library(dplyr)
+
+# Transforming the data into a long format
+long_data <- dta %>% 
+  pivot_longer(cols = everything(), 
+               names_to = "variable", 
+               values_to = "value") %>%
+  mutate(value_type = ifelse(value == 0, "Zero", "Non-zero"))
+
+library(ggplot2)
+
+ggplot(long_data, aes(x = variable, fill = value_type)) + 
+  geom_bar() + 
+  theme_minimal() + 
+  labs(title = "Sparsity in scRNA-seq and scATAC-seq Variables", 
+       x = "Variable", 
+       y = "Count") + 
+  scale_fill_brewer(palette = "Set1", name = "Value Type") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+ATACseq (all have >50% missing) has more missing data than RNAseq. 
+
+See if all the missings come from same genes
+```{r}
+data <- dta
+data$Identifier <- paste("Gene", seq_len(nrow(data)), sep="_")
+library(reshape2)
+
+long_data <- melt(data, id.vars = "Identifier", variable.name = "Variable", value.name = "Value")
+library(ggplot2)
+# ggsave("high_res_heatmap.png", plot = last_plot(), dpi = 300, width = 12, height = 10)
+
+ggplot(long_data, aes(x = Variable, y = Identifier)) + 
+  geom_tile(aes(fill = factor(Value == 0)), color = "white") + 
+  scale_fill_manual(values = c("TRUE" = "blue", "FALSE" = "grey"), 
+                    name = "Value", 
+                    labels = c("Zero", "Non-zero")) +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text.y = element_text(angle = 0, hjust = 1, vjust = 0.5)) +
+  labs(title = "Heatmap of scRNA-seq and scATAC-seq Variables", x = "Variable", y = "Identifier")
+
+
+```
+
+```{r}
+# Assuming 'data' is the original dataframe with genes as rows and variables as columns.
+# Add a row identifier if it doesn't exist
+ATAC_data <- data %>% dplyr::select(ends_with("ATAC"))
+ATAC_data$GeneID <- paste0("Gene_", seq_len(nrow(ATAC_data)))
+
+# Calculate the proportion of missing values (assuming zeros are missing)
+missingness <- data.frame(GeneID = ATAC_data$GeneID, 
+                          ProportionMissing = rowSums(ATAC_data == 0) / ncol(ATAC_data))
+
+# Melting for ggplot
+long_missingness <- melt(missingness, id.vars = "GeneID")
+
+# Heatmap of missingness
+ggplot(long_missingness, aes(x = variable, y = GeneID, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "red") +
+  theme_minimal() +
+  labs(x = "", y = "Gene", fill = "Proportion\nMissing", title = "Missingness Heatmap by Gene")
+
+```
+```{r}
+# Count the number of genes with all measurements as zero
+number_of_genes_all_zeros <- sum(rowSums(ATAC_data == 0) == 7)
+number_of_genes_all_zeros
+```
+There are only 320 genes with all missing data. Graph and summary stats indicate the missingness is spread out in the ATACseq dataset. 
+
+# Check data distribution
+
+## Check ATAC
+```{r}
+library(dplyr)
+sox2_atac_zero_removed <- dta %>% filter(SOX2_ATAC != 0)
+
+hist(log(sox2_atac_zero_removed$SOX2_ATAC))
+qqnorm(log(sox2_atac_zero_removed$SOX2_ATAC))
+library(nortest)
+ad.test(sox2_atac_zero_removed$SOX2_ATAC)
+```
+
+```{r}
+average_sparsity <- dta %>%
+  dplyr::select(ends_with("_ATAC")) %>%
+  dplyr::summarise_all(~mean(. == 0)) %>%
+  dplyr::summarise(average_sparsity = mean(.))
+
+# Print the average sparsity
+average_sparsity
+```
+```{r}
+proportion_zeros_ATAC <- dta %>%
+  summarise(across(ends_with("_ATAC"), ~mean(. == 0, na.rm = TRUE)))
+proportion_zeros_ATAC
+mean(t(proportion_zeros_ATAC))
+var(t(proportion_zeros_ATAC))
+```
+### find mean and sd after log transformation
+```{r}
+library(dplyr)
+mean(log(dta %>% filter(SOX2_ATAC != 0) %>% select(SOX2_ATAC)))
+
+```
+```{r}
+library(dplyr)
+library(purrr)
+
+mean_var_log_ATAC <- dta %>%
+  # Selects only columns ending with "ATAC"
+  select(ends_with("ATAC")) %>%
+  # Apply function to replace 0 with NA and calculate log
+  mutate(across(.fns = ~ifelse(. == 0, NA, log(.)))) %>%
+  # Calculate mean and standard deviation, ignoring NA values
+  summarise(across(everything(), list(
+    mean_log = ~mean(., na.rm = TRUE), 
+    var_log = ~var(., na.rm = TRUE)
+  ), .names = "{.fn}_{.col}"))
+
+mean_var_log_ATAC
+
+```
+```{r}
+## get mean of the mean and var
+library(dplyr)
+
+# Calculate the overall mean of mean logarithmic values
+overall_mean_log <- mean_var_log_ATAC %>%
+  select(starts_with("mean_log_")) %>%
+  unlist() %>%
+  mean(na.rm = TRUE)
+
+# Calculate the overall mean of variance values
+# Since variance can be approximated by standard deviation squared
+overall_mean_variance <- mean_var_log_ATAC %>%
+  select(starts_with("var_log_")) %>%
+  unlist() %>%
+  mean(na.rm = TRUE)
+
+list(overall_mean_log = overall_mean_log, overall_mean_variance = overall_mean_variance)
+
+```
+
+
+
+```{r}
+proportion_zeros_RNA <- dta %>%
+  summarise(across(ends_with("_RNA"), ~mean(. == 0, na.rm = TRUE)))
+proportion_zeros_RNA
+mean(t(proportion_zeros_RNA))
+```
+
+```{r}
+library(dplyr)
+library(purrr)
+
+mean_var_RNA <- dta %>%
+  # Selects only columns ending with "ATAC"
+  select(ends_with("RNA")) %>%
+  summarise(across(everything(), list(
+    mean = ~mean(., na.rm = TRUE), 
+    var = ~var(., na.rm = TRUE)
+  ), .names = "{.fn}_{.col}"))
+
+mean_var_RNA
+
+```
+
+```{r}
+## get mean of the mean and var
+library(dplyr)
+
+# Calculate the overall mean of mean logarithmic values
+overall_mean_mean_RNA <- mean_var_RNA %>%
+  select(starts_with("mean_")) %>%
+  unlist() %>%
+  mean(na.rm = TRUE)
+
+# Calculate the overall mean of variance values
+# Since variance can be approximated by standard deviation squared
+overall_mean_var_RNA <- mean_var_RNA %>%
+  select(starts_with("var_")) %>%
+  unlist() %>%
+  mean(na.rm = TRUE)
+
+list(overall_mean_mean_RNA = overall_mean_mean_RNA, overall_mean_var_RNA = overall_mean_var_RNA)
+
+```
+```{r}
+## MoM estimator for r and p in NB
+library(dplyr)
+
+r_hat_RNA <- dta %>%
+  select(ends_with("RNA")) %>%
+  summarise(across(everything(), function(x) {
+    mean_x <- mean(x, na.rm = TRUE)
+    var_x <- var(x, na.rm = TRUE)
+    r_hat <- (mean_x^2) / (var_x - mean_x) 
+    return(r_hat)
+  }))
+
+p_hat_RNA <- dta %>%
+  select(ends_with("RNA")) %>%
+  summarise(across(everything(), function(x) {
+    mean_x <- mean(x, na.rm = TRUE)
+    var_x <- var(x, na.rm = TRUE)
+    p_hat <- 1 - mean_x/var_x
+    return(p_hat)
+  }))
+
+list(r_hat_RNA = mean(t(r_hat_RNA)), p_hat_RNA = mean(t(p_hat_RNA)))
+
+```
+
+
+## Check RNA
+```{r}
+library(dplyr)
+sox2_rna_zero_removed <- dta %>% select(SOX2_RNA) %>% filter(SOX2_RNA != 0)
+
+hist(sox2_rna_zero_removed$SOX2_RNA)
+hist(log(sox2_rna_zero_removed$SOX2_RNA))
+```
+
+```{r}
+# Fit a Poisson model
+lambda_hat <- mean(sox2_rna_zero_removed$SOX2_RNA)
+log_likelihood_poisson <- sum(dpois(sox2_rna_zero_removed$SOX2_RNA, lambda_hat, log = TRUE))
+
+# fit nb
+library(MASS)
+fit_negbin <- glm.nb(sox2_rna_zero_removed$SOX2_RNA ~ 1)
+fitted_means <- fitted(fit_negbin)
+log_likelihood_negbin <- sum(dnbinom(sox2_rna_zero_removed$SOX2_RNA, size = fit_negbin$theta, mu = fitted_means, log = TRUE))
+
+# Calculate the likelihood ratio statistic
+lr_statistic <- -2 * (log_likelihood_poisson - log_likelihood_negbin)
+
+# Compare to chi-square distribution with degrees of freedom equal to difference in parameters
+df <- length(sox2_rna_zero_removed$SOX2_RNA) -1 # Adjust based on your models
+p_value <- pchisq(lr_statistic, df, lower.tail = FALSE)
+
+p_value
+
+```
+
+```{r}
+# Calculate the Neyman-Scott statistic
+transformed_data <- sqrt(data)
+mean_transformed <- mean(transformed_data)
+var_transformed <- var(transformed_data)
+
+ns_statistic <- (var_transformed - 1 / (4 * length(data))) / sqrt(mean_transformed^2 / (2 * length(data)))
+
+# P-value from normal approximation
+p_value_ns <- 2 * pnorm(abs(ns_statistic), lower.tail = FALSE)
+
+p_value_ns
+
+```
+
+NB GLM is significantly better than poisson. (for both remove 0 or not remove 0)
+
+## Predict RNA from ATAC
+### Poisson vs NB GLM with zero removed
+```{r}
+library(dplyr)
+
+zero_removed_dta_ATAC_only <- dta %>%
+  dplyr::select(SOX2_RNA, SOX2_ATAC) %>%
+  dplyr::filter(SOX2_ATAC != 0) 
+```
+
+
+```{r}
+library(MASS)
+library(lmtest)
+poisson_model <- glm(SOX2_RNA ~ log(SOX2_ATAC), data = zero_removed_dta_ATAC_only, family = poisson)
+nb_model <- glm.nb(SOX2_RNA ~ log(SOX2_ATAC), data = zero_removed_dta_ATAC_only, link = 'log')
+# Conduct Likelihood Ratio Test
+lrt_result <- lrtest(poisson_model, nb_model)
+print(lrt_result)
+```
+Negative Binomial GLM is significantly better. 
+
+```{r}
+predicted_values <- predict(nb_model, type = "response")
+library(ggplot2)
+
+# Creating a data frame for ggplot
+data_for_plot <- data.frame(Observed = zero_removed_dta_ATAC_only$SOX2_RNA, Predicted = predicted_values)
+
+ggplot(data_for_plot, aes(x = Observed, y = Predicted)) +
+  geom_point(alpha = 0.5) +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+  labs(x = "Observed Values", y = "Predicted Values", title = "Observed vs. Predicted Values") +
+  theme_minimal()
+
+```
+
+### compare GLM and GAM
+```{r}
+library(mgcv)
+
+# Fit a GLM using `gam` with an identity link for the smooth term
+nb_glm_gam <- gam(SOX2_RNA ~ log(SOX2_ATAC), data = zero_removed_dta_ATAC_only, family=nb(link = 'log'))
+
+# Fit a GAM with a smooth term
+nb_gam_gam <- gam(SOX2_RNA ~ s(log(SOX2_ATAC)), data = zero_removed_dta_ATAC_only, family=nb(link = 'log'))
+
+# Perform LRT
+lrt_result <- anova(nb_glm_gam, nb_gam_gam, test = "Chisq")
+lrt_result
+```
+GAM is significantly better. 
+```{r}
+AIC(nb_model)
+AIC(rna_gam_model)
+```
+GAM also has slightly lower AIC. 
+
+```{r}
+library(ggplot2)
+library(mgcv)
+
+fitted_values_gam <- predict(rna_gam_model, type = "response")
+
+# Create a new data frame containing observed and fitted values
+obs_vs_fitted_gam <- data.frame(
+  Observed = zero_removed_dta_ATAC_only$SOX2_RNA,
+  Fitted = fitted_values_gam
+)
+
+# Generate the observed vs. fitted plot using ggplot2
+ggplot(obs_vs_fitted_gam, aes(x = Observed, y = Fitted)) +
+  geom_point(alpha = 0.5) +  # Use alpha to adjust point transparency if there are many overlapping points
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +  # Add a reference line y=x
+  labs(title = "Observed vs Fitted Values for GAM Model",
+       x = "Observed Values",
+       y = "Fitted Values") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## predict ATAC from RNA
+```{r}
+atac_model <- glm(log(SOX2_ATAC) ~ SOX2_RNA, data = zero_removed_dta_ATAC_only, family = gaussian())
+summary(atac_model)
+```
+```{r}
+library(ggplot2)
+fitted_values <- predict.glm(atac_model, type = "response")
+
+obs_vs_fitted <- data.frame(
+  Observed = log(zero_removed_dta_ATAC_only$SOX2_ATAC),
+  Fitted = fitted_values
+)
+
+ggplot(obs_vs_fitted, aes(x = Observed, y = Fitted)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
+  labs(title = "Observed vs Fitted Values", x = "Observed Log(SOX2_ATAC)", y = "Fitted Values") +
+  theme_minimal()  
+
+```
+### compare GLM and GAM
+```{r}
+library(mgcv)
+
+# Fit a GAM
+atac_gam_model <- gam(log(SOX2_ATAC) ~ s(SOX2_RNA), data = zero_removed_dta_ATAC_only, family = gaussian())
+
+# Perform LRT
+lrt_result <- anova(atac_model, atac_gam_model, test = "Chisq")
+lrt_result
+```
+GAM is significantly better. 
+```{r}
+AIC(atac_model)
+AIC(atac_gam_model)
+```
+The GAM also has lower AIC (although not much lower)
+
+```{r}
+library(ggplot2)
+library(mgcv)
+
+fitted_values_gam <- predict(atac_gam_model, type = "response")
+
+# Create a new data frame containing observed and fitted values
+obs_vs_fitted_gam <- data.frame(
+  Observed = log(zero_removed_dta_ATAC_only$SOX2_ATAC),
+  Fitted = fitted_values_gam
+)
+
+# Generate the observed vs. fitted plot using ggplot2
+ggplot(obs_vs_fitted_gam, aes(x = Observed, y = Fitted)) +
+  geom_point(alpha = 0.5) +  # Use alpha to adjust point transparency if there are many overlapping points
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +  # Add a reference line y=x
+  labs(title = "Observed vs Fitted Values for GAM Model",
+       x = "Observed Values",
+       y = "Fitted Values") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+# Instead of removing zeros for ATAC, Impute using multiple imputation (MICE)
+```{r}
+library(mice)
+library(dplyr)
+
+ATAC_dta_temp <- dta %>%
+  dplyr::select(dplyr::ends_with("ATAC")) 
+
+ATAC_dta_temp[ATAC_dta_temp == 0] <- NA
+ATAC_dta_temp_log <- log(ATAC_dta_temp)
+ATAC_imputed_log_data <- mice(ATAC_dta_temp_log, method = 'norm', m = 5, maxit = 5)
+ATAC_imputed_log_data <- complete(ATAC_imputed_log_data)
+
+```
+```{r}
+imputed_log_data <- dplyr::cross_join(ATAC_imputed_log_data, dplyr::select(dta, ends_with("RNA")))
+```
+
+### compare GLM and GAM
+```{r}
+library(mgcv)
+
+nb_glm_gam_im <- gam(SOX2_RNA ~ SOX2_ATAC + HES1_ATAC + PAX6_ATAC + SOX6_ATAC + SOX9_ATAC + GLI3_ATAC + ASCL1_ATAC, data = imputed_log_data, family=nb(link = 'log'))
+
+nb_gam_gam_im <- gam(SOX2_RNA ~ s(SOX2_ATAC) + s(HES1_ATAC) + s(PAX6_ATAC) + s(SOX6_ATAC) + s(SOX9_ATAC) + s(GLI3_ATAC) + s(ASCL1_ATAC), data = imputed_data, family=nb(link = 'log'))
+
+# Perform LRT
+lrt_result_im <- anova(nb_glm_gam_im, nb_gam_gam_im, test = "Chisq")
+lrt_result_im
+```
