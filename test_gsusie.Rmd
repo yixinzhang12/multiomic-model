@@ -9,7 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Read ATAC data
+# Prepare ATAC data
+## data cleaning/wrangling
 ```{r}
 library(vroom)
 library(dplyr)
@@ -27,15 +28,15 @@ atac_real_data = data.frame(t(atac_real_data))
 ```
 
 ```{r}
-colnames(atac_real_data) <- unlist(atac_real_data[1, ])
+colnames(atac_real_data) <- unlist(atac_real_data[1, ])# assign col names with first row
 ```
 
 ```{r}
-atac_real_data <- atac_real_data[-1, ]
+atac_real_data <- atac_real_data[-1, ] # remove first row
 ```
 
 ```{r}
-# atac_real_data <- mutate_all(atac_real_data, function(x) as.numeric(as.character(x)))
+# change data to character
 atac_real_data[] <- lapply(atac_real_data, function(x) if(is.character(x)) as.numeric(x) else x)
 ```
 
@@ -45,15 +46,14 @@ percentage_zeros <- sapply(atac_real_data, function(column) {
   mean(column == 0) * 100
 })
 ```
-
+plot percentage of zeros
 ```{r}
 hist(percentage_zeros)
 ```
 
-34 non-unique col names, make them unique
 ```{r}
 library(dplyr)
-
+# solution for non-unique names error in filtering variables
 # Create a function to rename duplicates with a unique suffix
 make_unique <- function(names) {
   counts <- ave(seq_along(names), names, FUN = seq_along)
@@ -66,14 +66,63 @@ colnames(atac_real_data) <- make_unique(colnames(atac_real_data))
 
 ```
 
-Remove cols with missingness over 10% (arbitrary, for computing/imputing sake) (80% too much memory during gsusie)
+Remove cols with missingness over 10% (arbitrary, for computing/imputing sake)
+resulting df has 841 variables, which is 841/19836 = 0.04 of the entire ATAC data
 
 ```{r}
 cols_to_remove <- sapply(atac_real_data, function(column) mean(column == 0) > 0.1)
 atac_real_data_0_filtered <- atac_real_data[, !cols_to_remove]
 ```
 
-prepare RNAseq data
+```{r}
+# save filtered data to local
+# write.csv(atac_real_data, "./test_data/rearranged_atac_activity.csv", row.names=FALSE)
+# write.csv(atac_real_data_0_filtered, "./test_data/zero_rm_10_atac_activity.csv", row.names=FALSE)
+```
+
+```{r}
+atac_real_data_0_filtered_10 <- read.csv("./test_data/zero_rm_10_atac_activity.csv", header = TRUE)
+```
+
+```{r}
+#convert to matrix (for gsusie)
+atac_matrix <- as.matrix(atac_real_data_0_filtered_10)
+colnames(atac_matrix) <- NULL
+```
+
+## Solution(s) to: ATACseq data contains missing (0s) and is lognormal 
+Try1. apply log to 0s: gsusie does not work with -Inf values (Too much abnormal subjects detected!)
+Try2. listwise deletion & pairwise deletion (does not work: it would remove all the rows/columns)
+```{r}
+# rows_with_zeros <- apply(atac_matrix, 1, function(x) any(x == 0))
+# atac_matrix_0_rm <- atac_matrix[!rows_with_zeros, ]
+# atac_log_matrix_0_rm <- log(atac_matrix_0_rm)
+```
+Try3. Imputation before standardization (taking too long, blackbox impute)
+```{r}
+# library(hdImpute)
+# ## hdImpute: fast random forest
+# hdImpute(data.frame(atac_log_matrix_NA_st), batch = 100, seed = 0, save = TRUE)
+```
+
+**4. replace 0 with NA --> log --> standardize --> fill in NA with 0 --> gsusie ("Too much abnormal subjects detected!")**
+```{r}
+atac_matrix_NA <- atac_matrix
+atac_matrix_NA[atac_matrix_NA == 0] <- NA #replace 0 with NA
+atac_log_matrix_NA <- log(atac_matrix_NA) #apply log transformation
+```
+standardize
+```{r}
+atac_log_matrix_NA_st <-apply(atac_matrix_NA, 2, function(x) {
+    (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+  })
+```
+replace na with 0 (since the standardized data have mean = 0) in the standardized data
+```{r}
+atac_log_matrix_NA_st[is.na(atac_log_matrix_NA_st)] <- 0
+```
+
+# prepare RNAseq data
 get from ``test_data``
 ```{r}
 rna_7_var <- read.csv('./test_data/rna_7_var.csv')
@@ -90,89 +139,18 @@ hist(SOX2RNA)
 ```
 
 ```{r}
-# write.csv(atac_real_data, "./test_data/rearranged_atac_activity.csv", row.names=FALSE)
-# write.csv(atac_real_data_0_filtered, "./test_data/zero_rm_50_atac_activity.csv", row.names=FALSE)
-write.csv(atac_real_data_0_filtered, "./test_data/zero_rm_10_atac_activity.csv", row.names=FALSE)
-```
-
-```{r}
 mean(SOX2RNA)
 var(SOX2RNA)
 ```
 overdispersed
 
-# Apply gsusie
 ```{r}
-atac_real_data_0_filtered_10 <- read.csv("./test_data/zero_rm_10_atac_activity.csv", header = TRUE)
-```
-
-```{r}
-atac_matrix <- as.matrix(atac_real_data_0_filtered_10)
-colnames(atac_matrix) <- NULL
-rna_matrix <- as.matrix(SOX2RNA)
-```
-
-Took 15 minutes to run on 50% of ATACseq data
-```{r}
-library(gsusie)
-res_gs <- gsusie(cbind(atac_matrix, 1), rna_matrix, family = "poisson")
-```
-
-```{r}
-print_gsusie_coefficients(res_gs)
+rna_matrix <- as.matrix(SOX2RNA) # prepare y
 ```
 
 
-```{r}
-print(res_gs$sets)
-```
-
-```{r}
-gsusie_plot(res_gs, y = "PIP", include_intercept = FALSE, intercept_index = (ncol(atac_matrix)+1))
-```
-
-```{r}
-gsusie_plot(res_gs, y = "PIP", include_intercept = TRUE)
-```
-
-find out the names to those atacseq
-```{r}
-atac_filtered_colnames <- colnames(atac_real_data_0_filtered)
-atac_filtered_colnames[as.integer(res_gs$sets$cs)]
-```
-
-## ATACseq data contains missing (0s) and is lognormal 
-1. gsusie does not work with -Inf values (Too much abnormal subjects detected!)
-3. listwise deletion & pairwise deletion (does not work: removes all the rows)
-```{r}
-# rows_with_zeros <- apply(atac_matrix, 1, function(x) any(x == 0))
-# atac_matrix_0_rm <- atac_matrix[!rows_with_zeros, ]
-# atac_log_matrix_0_rm <- log(atac_matrix_0_rm)
-```
-4. Imputation before standardization (taking too long, blackbox impute)
-```{r}
-library(hdImpute)
-## hdImpute: fast random forest
-hdImpute(data.frame(atac_log_matrix_NA_st), batch = 100, seed = 0, save = TRUE)
-```
-
-2. replace 0 with NA --> log --> standardize --> fill in NA with 0 --> gsusie ("Too much abnormal subjects detected!")
-```{r}
-atac_matrix_NA <- atac_matrix
-atac_matrix_NA[atac_matrix_NA == 0] <- NA
-atac_log_matrix_NA <- log(atac_matrix_NA)
-```
-standardize
-```{r}
-atac_log_matrix_NA_st <-apply(atac_matrix_NA, 2, function(x) {
-    (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
-  })
-```
-replace na with 0 (mean = 0) in the standardized data
-```{r}
-atac_log_matrix_NA_st[is.na(atac_log_matrix_NA_st)] <- 0
-```
-apply gsusie
+# apply gsusie 
+(30 seconds to run on 841 predictor variables (4% of entire ATAC dataset))
 ```{r}
 library(gsusie)
 res_gs2 <- gsusie(cbind(atac_log_matrix_NA_st, 1), rna_matrix, family = "poisson")
@@ -188,6 +166,12 @@ gsusie_plot(res_gs2, y = "PIP", include_intercept = TRUE)
 ```
 ```{r}
 summary(res_gs2)
+```
+
+find out the ATAC gene names to those variables with high PIP
+```{r}
+atac_filtered_colnames <- colnames(atac_real_data_0_filtered_10)
+atac_filtered_colnames[as.integer(unlist(res_gs2$sets$cs))]
 ```
 
 ## spearman correlation
